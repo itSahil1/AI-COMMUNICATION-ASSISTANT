@@ -47,7 +47,7 @@ export default function Dashboard() {
   const handleFilterChange = (key: keyof EmailFilters, value: string) => {
     setFilters(prev => ({
       ...prev,
-      [key]: value || undefined,
+      [key]: value === 'all' ? undefined : value,
     }));
   };
 
@@ -110,7 +110,7 @@ export default function Dashboard() {
                       <SelectValue placeholder="All Emails" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Emails</SelectItem>
+                      <SelectItem value="all">All Emails</SelectItem>
                       <SelectItem value="pending">Pending Only</SelectItem>
                       <SelectItem value="resolved">Resolved Only</SelectItem>
                     </SelectContent>
@@ -124,7 +124,7 @@ export default function Dashboard() {
                       <SelectValue placeholder="All Priorities" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Priorities</SelectItem>
+                      <SelectItem value="all">All Priorities</SelectItem>
                       <SelectItem value="urgent">Urgent Only</SelectItem>
                       <SelectItem value="normal">Normal Only</SelectItem>
                       <SelectItem value="low">Low Only</SelectItem>
@@ -139,7 +139,7 @@ export default function Dashboard() {
                       <SelectValue placeholder="All Sentiments" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Sentiments</SelectItem>
+                      <SelectItem value="all">All Sentiments</SelectItem>
                       <SelectItem value="positive">Positive Only</SelectItem>
                       <SelectItem value="neutral">Neutral Only</SelectItem>
                       <SelectItem value="negative">Negative Only</SelectItem>

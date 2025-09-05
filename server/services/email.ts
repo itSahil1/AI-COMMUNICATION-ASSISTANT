@@ -1,4 +1,4 @@
-import { Imap, ImapMessage } from 'imap';
+import Imap from 'imap';
 import { simpleParser, ParsedMail } from 'mailparser';
 import { gmail_v1, google } from 'googleapis';
 import { storage } from '../storage';
@@ -117,7 +117,7 @@ export class EmailService {
 
             const fetch = imap.fetch(results, { bodies: '' });
 
-            fetch.on('message', (msg: ImapMessage) => {
+            fetch.on('message', (msg: any) => {
               msg.on('body', (stream) => {
                 simpleParser(stream, async (err, parsed) => {
                   if (err) {
