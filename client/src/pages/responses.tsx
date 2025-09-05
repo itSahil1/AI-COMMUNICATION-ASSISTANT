@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Sidebar } from "@/components/sidebar";
+import { AnalyticsModal } from "@/components/analytics-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +30,7 @@ interface Response {
 
 export default function Responses() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   const { data: responses = [], isLoading, refetch } = useQuery<Response[]>({
     queryKey: ['/api/responses'],
@@ -66,7 +69,14 @@ export default function Responses() {
   };
 
   return (
-    <div className="p-6">
+    <div className="flex h-screen bg-background">
+      <Sidebar 
+        onAnalyticsClick={() => setShowAnalytics(true)}
+        data-testid="sidebar"
+      />
+      
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -236,6 +246,16 @@ export default function Responses() {
           ))
         )}
       </div>
+        </div>
+      </main>
+      
+      {showAnalytics && (
+        <AnalyticsModal 
+          isOpen={showAnalytics}
+          onClose={() => setShowAnalytics(false)}
+          data-testid="analytics-modal"
+        />
+      )}
     </div>
   );
 }

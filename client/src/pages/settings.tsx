@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Sidebar } from "@/components/sidebar";
+import { AnalyticsModal } from "@/components/analytics-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function Settings() {
   const { toast } = useToast();
+  const [showAnalytics, setShowAnalytics] = useState(false);
   const [settings, setSettings] = useState({
     openaiApiKey: "",
     emailProvider: "imap",
@@ -97,7 +100,14 @@ export default function Settings() {
   };
 
   return (
-    <div className="p-6">
+    <div className="flex h-screen bg-background">
+      <Sidebar 
+        onAnalyticsClick={() => setShowAnalytics(true)}
+        data-testid="sidebar"
+      />
+      
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -435,6 +445,16 @@ export default function Settings() {
           </Card>
         </TabsContent>
       </Tabs>
+        </div>
+      </main>
+      
+      {showAnalytics && (
+        <AnalyticsModal 
+          isOpen={showAnalytics}
+          onClose={() => setShowAnalytics(false)}
+          data-testid="analytics-modal"
+        />
+      )}
     </div>
   );
 }

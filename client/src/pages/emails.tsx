@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Sidebar } from "@/components/sidebar";
+import { AnalyticsModal } from "@/components/analytics-modal";
 import { EmailCard } from "@/components/email-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +10,7 @@ import { RefreshCw, Search, Mail } from "lucide-react";
 import type { Email, EmailFilters } from "@/lib/types";
 
 export default function Emails() {
+  const [showAnalytics, setShowAnalytics] = useState(false);
   const [filters, setFilters] = useState<EmailFilters>({
     limit: 50,
     offset: 0,
@@ -53,7 +56,14 @@ export default function Emails() {
   };
 
   return (
-    <div className="p-6">
+    <div className="flex h-screen bg-background">
+      <Sidebar 
+        onAnalyticsClick={() => setShowAnalytics(true)}
+        data-testid="sidebar"
+      />
+      
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -165,6 +175,16 @@ export default function Emails() {
           ))
         )}
       </div>
+        </div>
+      </main>
+      
+      {showAnalytics && (
+        <AnalyticsModal 
+          isOpen={showAnalytics}
+          onClose={() => setShowAnalytics(false)}
+          data-testid="analytics-modal"
+        />
+      )}
     </div>
   );
 }
