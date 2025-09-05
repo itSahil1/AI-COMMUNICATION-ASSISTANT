@@ -1,10 +1,25 @@
 import { Bot, BarChart3, Mail, MessageSquare, Settings, Gauge, User } from "lucide-react";
+import { Link, useLocation } from "wouter";
 
 interface SidebarProps {
   onAnalyticsClick: () => void;
 }
 
 export function Sidebar({ onAnalyticsClick }: SidebarProps) {
+  const [location] = useLocation();
+  
+  const isActive = (path: string) => {
+    if (path === "/" && location === "/") return true;
+    return location.startsWith(path) && path !== "/";
+  };
+
+  const linkClassName = (path: string) => {
+    const baseClass = "flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors";
+    return isActive(path) 
+      ? `${baseClass} bg-primary text-primary-foreground`
+      : `${baseClass} text-muted-foreground hover:bg-accent hover:text-accent-foreground`;
+  };
+
   return (
     <aside className="w-64 bg-card border-r border-border flex flex-col">
       <div className="p-6 border-b border-border">
@@ -20,17 +35,17 @@ export function Sidebar({ onAnalyticsClick }: SidebarProps) {
       </div>
       
       <nav className="flex-1 p-4 space-y-2">
-        <a 
-          href="#" 
-          className="flex items-center space-x-3 px-3 py-2 rounded-lg bg-primary text-primary-foreground"
+        <Link 
+          href="/"
+          className={linkClassName("/")}
           data-testid="link-dashboard"
         >
           <Gauge className="w-4 h-4" />
           <span className="font-medium">Dashboard</span>
-        </a>
-        <a 
-          href="#" 
-          className="flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+        </Link>
+        <Link 
+          href="/emails"
+          className={linkClassName("/emails")}
           data-testid="link-emails"
         >
           <Mail className="w-4 h-4" />
@@ -38,15 +53,15 @@ export function Sidebar({ onAnalyticsClick }: SidebarProps) {
           <span className="ml-auto bg-destructive text-destructive-foreground text-xs px-2 py-1 rounded-full" data-testid="text-urgent-count">
             23
           </span>
-        </a>
-        <a 
-          href="#" 
-          className="flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+        </Link>
+        <Link 
+          href="/responses"
+          className={linkClassName("/responses")}
           data-testid="link-responses"
         >
           <MessageSquare className="w-4 h-4" />
           <span>Responses</span>
-        </a>
+        </Link>
         <button 
           onClick={onAnalyticsClick}
           className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-left"
@@ -55,14 +70,14 @@ export function Sidebar({ onAnalyticsClick }: SidebarProps) {
           <BarChart3 className="w-4 h-4" />
           <span>Analytics</span>
         </button>
-        <a 
-          href="#" 
-          className="flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+        <Link 
+          href="/settings"
+          className={linkClassName("/settings")}
           data-testid="link-settings"
         >
           <Settings className="w-4 h-4" />
           <span>Settings</span>
-        </a>
+        </Link>
       </nav>
       
       <div className="p-4 border-t border-border">
