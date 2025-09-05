@@ -274,7 +274,9 @@ export class EmailService {
   }
 
   static createFromEnv(): EmailService {
-    const provider = process.env.EMAIL_PROVIDER as 'gmail' | 'imap' || 'imap';
+    // Force Gmail provider if Gmail credentials are available
+    const hasGmailCredentials = !!(process.env.GMAIL_CLIENT_ID && process.env.GMAIL_CLIENT_SECRET && process.env.GMAIL_REFRESH_TOKEN);
+    const provider = hasGmailCredentials ? 'gmail' : 'imap';
 
     const config: EmailConfig = { provider };
 
