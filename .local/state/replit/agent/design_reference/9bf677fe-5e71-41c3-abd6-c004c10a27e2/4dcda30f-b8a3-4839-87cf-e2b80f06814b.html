@@ -1,0 +1,694 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Communication Assistant Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                },
+                fontFamily: {
+                    sans: ["Inter", "sans-serif"],
+                }
+            },
+        }
+    };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --background: hsl(210 40% 98%);
+            --foreground: hsl(222 84% 4.9%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(222 84% 4.9%);
+            --primary: hsl(217 91% 60%);
+            --primary-foreground: hsl(210 40% 98%);
+            --secondary: hsl(210 40% 96%);
+            --secondary-foreground: hsl(222 84% 4.9%);
+            --muted: hsl(210 40% 96%);
+            --muted-foreground: hsl(215 16% 47%);
+            --accent: hsl(210 40% 96%);
+            --accent-foreground: hsl(222 84% 4.9%);
+            --destructive: hsl(0 84% 60%);
+            --destructive-foreground: hsl(210 40% 98%);
+            --border: hsl(214 32% 91%);
+            --input: hsl(214 32% 91%);
+            --ring: hsl(217 91% 60%);
+            --radius: 0.5rem;
+        }
+        
+        .dark {
+            --background: hsl(222 84% 4.9%);
+            --foreground: hsl(210 40% 98%);
+            --card: hsl(222 84% 4.9%);
+            --card-foreground: hsl(210 40% 98%);
+            --primary: hsl(217 91% 60%);
+            --primary-foreground: hsl(222 84% 4.9%);
+            --secondary: hsl(217 19% 27%);
+            --secondary-foreground: hsl(210 40% 98%);
+            --muted: hsl(217 19% 27%);
+            --muted-foreground: hsl(215 20% 65%);
+            --accent: hsl(217 19% 27%);
+            --accent-foreground: hsl(210 40% 98%);
+            --destructive: hsl(0 62% 30%);
+            --destructive-foreground: hsl(210 40% 98%);
+            --border: hsl(217 19% 27%);
+            --input: hsl(217 19% 27%);
+            --ring: hsl(217 91% 60%);
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground font-sans antialiased">
+    <!-- @COMPONENT: MainLayout -->
+    <div class="flex h-screen bg-background">
+        <!-- @COMPONENT: Sidebar -->
+        <aside class="w-64 bg-card border-r border-border flex flex-col">
+            <div class="p-6 border-b border-border">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-robot text-primary-foreground text-sm"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-semibold text-foreground">AI Assistant</h1>
+                        <p class="text-xs text-muted-foreground">Communication Hub</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg bg-primary text-primary-foreground" data-event="click:navigateToDashboard">
+                    <i class="fas fa-tachometer-alt w-4 h-4"></i>
+                    <span class="font-medium">Dashboard</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors" data-event="click:navigateToEmails">
+                    <i class="fas fa-envelope w-4 h-4"></i>
+                    <span>Emails</span>
+                    <span class="ml-auto bg-destructive text-destructive-foreground text-xs px-2 py-1 rounded-full" data-bind="urgentEmailCount">23</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors" data-event="click:navigateToResponses">
+                    <i class="fas fa-reply w-4 h-4"></i>
+                    <span>Responses</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors" data-event="click:navigateToAnalytics">
+                    <i class="fas fa-chart-bar w-4 h-4"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors" data-event="click:navigateToSettings">
+                    <i class="fas fa-cog w-4 h-4"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            
+            <div class="p-4 border-t border-border">
+                <div class="flex items-center space-x-3 px-3 py-2">
+                    <div class="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-muted-foreground text-sm"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-foreground truncate" data-bind="user.name">Sarah Johnson</p>
+                        <p class="text-xs text-muted-foreground truncate" data-bind="user.role">Support Manager</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <!-- @END_COMPONENT: Sidebar -->
+
+        <!-- @COMPONENT: MainContent -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- @COMPONENT: Header -->
+            <header class="bg-card border-b border-border px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-semibold text-foreground">Email Dashboard</h2>
+                        <p class="text-sm text-muted-foreground">Monitor and manage incoming support emails</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <span class="text-sm text-muted-foreground">Live sync active</span>
+                        </div>
+                        <button class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors" data-event="click:refreshEmails" data-implementation="Should fetch latest emails from configured email accounts">
+                            <i class="fas fa-sync mr-2"></i>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+            </header>
+            <!-- @END_COMPONENT: Header -->
+
+            <div class="flex-1 flex overflow-hidden">
+                <!-- @COMPONENT: EmailListSection -->
+                <div class="flex-1 flex flex-col">
+                    <!-- @COMPONENT: StatsBar -->
+                    <div class="bg-card border-b border-border p-4">
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="bg-background rounded-lg p-3 border border-border">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs text-muted-foreground">Total Today</p>
+                                        <p class="text-lg font-semibold text-foreground" data-bind="stats.totalToday">127</p>
+                                    </div>
+                                    <i class="fas fa-envelope text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="bg-background rounded-lg p-3 border border-border">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs text-muted-foreground">Urgent</p>
+                                        <p class="text-lg font-semibold text-destructive" data-bind="stats.urgent">23</p>
+                                    </div>
+                                    <i class="fas fa-exclamation-triangle text-destructive"></i>
+                                </div>
+                            </div>
+                            <div class="bg-background rounded-lg p-3 border border-border">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs text-muted-foreground">Resolved</p>
+                                        <p class="text-lg font-semibold text-green-600" data-bind="stats.resolved">89</p>
+                                    </div>
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                </div>
+                            </div>
+                            <div class="bg-background rounded-lg p-3 border border-border">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs text-muted-foreground">Pending</p>
+                                        <p class="text-lg font-semibold text-amber-600" data-bind="stats.pending">38</p>
+                                    </div>
+                                    <i class="fas fa-clock text-amber-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- @END_COMPONENT: StatsBar -->
+
+                    <!-- @COMPONENT: FilterControls -->
+                    <div class="bg-card border-b border-border p-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center space-x-2">
+                                <label class="text-sm font-medium text-foreground">Filter:</label>
+                                <select class="px-3 py-1 border border-border rounded-md bg-background text-foreground text-sm" data-event="change:handleFilterChange">
+                                    <option>All Emails</option>
+                                    <option>Urgent Only</option>
+                                    <option>Positive Sentiment</option>
+                                    <option>Negative Sentiment</option>
+                                    <option>Unresolved</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <label class="text-sm font-medium text-foreground">Sort:</label>
+                                <select class="px-3 py-1 border border-border rounded-md bg-background text-foreground text-sm" data-event="change:handleSortChange">
+                                    <option>Priority (High to Low)</option>
+                                    <option>Time (Newest First)</option>
+                                    <option>Sentiment (Negative First)</option>
+                                </select>
+                            </div>
+                            <div class="ml-auto">
+                                <input type="search" placeholder="Search emails..." class="px-3 py-1 border border-border rounded-md bg-background text-foreground text-sm w-64" data-event="input:handleSearch" />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- @END_COMPONENT: FilterControls -->
+
+                    <!-- @COMPONENT: EmailList -->
+                    <div class="flex-1 overflow-y-auto p-4 space-y-3">
+                        <!-- @MAP: emails.map(email => ( -->
+                        <!-- @COMPONENT: EmailCard [urgent priority] -->
+                        <div class="bg-card rounded-lg border border-border p-4 hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-destructive" data-event="click:selectEmail" data-bind="email.id">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <span class="px-2 py-1 bg-destructive text-destructive-foreground text-xs rounded-full font-medium">URGENT</span>
+                                        <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Negative</span>
+                                        <span class="text-xs text-muted-foreground" data-bind="email.timestamp">2 min ago</span>
+                                    </div>
+                                    <h3 class="font-medium text-foreground mb-1" data-bind="email.subject">Critical: Cannot access account - immediate help needed</h3>
+                                    <p class="text-sm text-muted-foreground mb-2" data-bind="email.sender">john.doe@example.com</p>
+                                    <p class="text-sm text-foreground line-clamp-2" data-bind="email.preview">I've been trying to access my account for the past hour but keep getting an error message. This is extremely urgent as I have a presentation in 30 minutes...</p>
+                                    <div class="flex items-center space-x-4 mt-3 text-xs text-muted-foreground">
+                                        <span><i class="fas fa-phone mr-1"></i> <span data-bind="email.extractedPhone">+1-555-0123</span></span>
+                                        <span><i class="fas fa-tags mr-1"></i> Account Access</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end space-y-2">
+                                    <div class="w-3 h-3 bg-destructive rounded-full"></div>
+                                    <button class="text-primary hover:text-primary/80 text-xs" data-event="click:generateResponse">
+                                        <i class="fas fa-robot mr-1"></i>Generate Response
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: EmailCard -->
+
+                        <!-- @COMPONENT: EmailCard [normal priority] -->
+                        <div class="bg-card rounded-lg border border-border p-4 hover:shadow-md transition-shadow cursor-pointer" data-event="click:selectEmail" data-bind="email.id">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <span class="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded-full">Normal</span>
+                                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Neutral</span>
+                                        <span class="text-xs text-muted-foreground" data-bind="email.timestamp">15 min ago</span>
+                                    </div>
+                                    <h3 class="font-medium text-foreground mb-1" data-bind="email.subject">Question about product features</h3>
+                                    <p class="text-sm text-muted-foreground mb-2" data-bind="email.sender">sarah.wilson@company.com</p>
+                                    <p class="text-sm text-foreground line-clamp-2" data-bind="email.preview">Hi there! I'm interested in learning more about the advanced features of your platform. Could you provide some documentation or...</p>
+                                    <div class="flex items-center space-x-4 mt-3 text-xs text-muted-foreground">
+                                        <span><i class="fas fa-building mr-1"></i> Enterprise Customer</span>
+                                        <span><i class="fas fa-tags mr-1"></i> Product Inquiry</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end space-y-2">
+                                    <div class="w-3 h-3 bg-amber-400 rounded-full"></div>
+                                    <button class="text-primary hover:text-primary/80 text-xs" data-event="click:generateResponse">
+                                        <i class="fas fa-robot mr-1"></i>Generate Response
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: EmailCard -->
+
+                        <!-- @COMPONENT: EmailCard [positive] -->
+                        <div class="bg-card rounded-lg border border-border p-4 hover:shadow-md transition-shadow cursor-pointer" data-event="click:selectEmail" data-bind="email.id">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Low</span>
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Positive</span>
+                                        <span class="text-xs text-muted-foreground" data-bind="email.timestamp">1 hour ago</span>
+                                    </div>
+                                    <h3 class="font-medium text-foreground mb-1" data-bind="email.subject">Thank you for excellent support!</h3>
+                                    <p class="text-sm text-muted-foreground mb-2" data-bind="email.sender">mike.chen@startup.io</p>
+                                    <p class="text-sm text-foreground line-clamp-2" data-bind="email.preview">I wanted to reach out and thank your team for the outstanding support yesterday. The issue was resolved quickly and professionally...</p>
+                                    <div class="flex items-center space-x-4 mt-3 text-xs text-muted-foreground">
+                                        <span><i class="fas fa-star mr-1"></i> 5-star feedback</span>
+                                        <span><i class="fas fa-tags mr-1"></i> Feedback</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end space-y-2">
+                                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                                    <button class="text-primary hover:text-primary/80 text-xs" data-event="click:generateResponse">
+                                        <i class="fas fa-robot mr-1"></i>Generate Response
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: EmailCard -->
+                        <!-- @END_MAP )) -->
+
+                        <!-- Loading state -->
+                        <div class="bg-card rounded-lg border border-border p-4 animate-pulse" data-mock="true">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-3 h-3 bg-muted rounded-full"></div>
+                                <div class="flex-1 space-y-2">
+                                    <div class="h-4 bg-muted rounded w-3/4"></div>
+                                    <div class="h-3 bg-muted rounded w-1/2"></div>
+                                    <div class="h-3 bg-muted rounded w-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- @END_COMPONENT: EmailList -->
+                </div>
+                <!-- @END_COMPONENT: EmailListSection -->
+
+                <!-- @COMPONENT: ResponsePanel -->
+                <div class="w-96 bg-card border-l border-border flex flex-col">
+                    <div class="p-4 border-b border-border">
+                        <h3 class="text-lg font-semibold text-foreground">AI Response Generator</h3>
+                        <p class="text-sm text-muted-foreground">Review and edit generated responses</p>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                        <!-- @COMPONENT: SelectedEmailSummary -->
+                        <div class="bg-background rounded-lg p-3 border border-border">
+                            <h4 class="font-medium text-foreground mb-2">Selected Email</h4>
+                            <div class="space-y-2 text-sm">
+                                <div><span class="text-muted-foreground">From:</span> <span data-bind="selectedEmail.sender">john.doe@example.com</span></div>
+                                <div><span class="text-muted-foreground">Subject:</span> <span data-bind="selectedEmail.subject">Critical: Cannot access account</span></div>
+                                <div><span class="text-muted-foreground">Priority:</span> <span class="text-destructive font-medium" data-bind="selectedEmail.priority">Urgent</span></div>
+                                <div><span class="text-muted-foreground">Sentiment:</span> <span class="text-red-600" data-bind="selectedEmail.sentiment">Negative</span></div>
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: SelectedEmailSummary -->
+
+                        <!-- @COMPONENT: ExtractedInformation -->
+                        <div class="bg-background rounded-lg p-3 border border-border">
+                            <h4 class="font-medium text-foreground mb-2">Extracted Information</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-phone text-muted-foreground w-4"></i>
+                                    <span data-bind="extractedInfo.phone">+1-555-0123</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-clock text-muted-foreground w-4"></i>
+                                    <span data-bind="extractedInfo.urgency">Presentation in 30 minutes</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-tags text-muted-foreground w-4"></i>
+                                    <span data-bind="extractedInfo.category">Account Access Issue</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-exclamation-triangle text-muted-foreground w-4"></i>
+                                    <span data-bind="extractedInfo.keywords">Error message, urgent, immediate help</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: ExtractedInformation -->
+
+                        <!-- @COMPONENT: AIResponseGenerator -->
+                        <div class="bg-background rounded-lg p-3 border border-border">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-medium text-foreground">Generated Response</h4>
+                                <button class="px-3 py-1 bg-primary text-primary-foreground text-xs rounded-md hover:bg-primary/90 transition-colors" data-event="click:regenerateResponse" data-implementation="Should call OpenAI API to generate new response">
+                                    <i class="fas fa-sync mr-1"></i>Regenerate
+                                </button>
+                            </div>
+                            
+                            <!-- @STATE: isGenerating:boolean = false -->
+                            <div class="relative">
+                                <textarea 
+                                    class="w-full h-48 p-3 border border-border rounded-md bg-card text-foreground text-sm resize-none focus:ring-2 focus:ring-ring focus:border-transparent" 
+                                    placeholder="AI-generated response will appear here..."
+                                    data-bind="generatedResponse"
+                                    data-event="input:handleResponseEdit"
+                                >Dear John,
+
+Thank you for contacting us regarding your account access issue. I understand this is urgent, especially with your presentation coming up in 30 minutes.
+
+I've immediately escalated your case to our technical team and they are working on resolving the error you're experiencing. As a priority customer, we want to ensure you have immediate access.
+
+In the meantime, please try these quick steps:
+1. Clear your browser cache and cookies
+2. Try accessing from an incognito/private window
+3. If the issue persists, please call our priority support line at +1-800-SUPPORT
+
+I'll personally monitor your case and follow up within the next 10 minutes with an update.
+
+Best regards,
+Sarah Johnson
+Support Team</textarea>
+                                
+                                <!-- Loading overlay for AI generation -->
+                                <div class="absolute inset-0 bg-background/80 rounded-md flex items-center justify-center hidden" data-bind="isGenerating">
+                                    <div class="flex items-center space-x-2 text-primary">
+                                        <i class="fas fa-spinner animate-spin"></i>
+                                        <span class="text-sm">Generating response...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: AIResponseGenerator -->
+
+                        <!-- @COMPONENT: ResponseActions -->
+                        <div class="flex space-x-2">
+                            <button class="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium" data-event="click:sendResponse" data-implementation="Should send email via configured SMTP">
+                                <i class="fas fa-paper-plane mr-2"></i>Send Response
+                            </button>
+                            <button class="px-4 py-2 border border-border text-foreground rounded-md hover:bg-accent transition-colors" data-event="click:saveAsDraft">
+                                <i class="fas fa-save"></i>
+                            </button>
+                        </div>
+                        <!-- @END_COMPONENT: ResponseActions -->
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: ResponsePanel -->
+            </div>
+        </main>
+        <!-- @END_COMPONENT: MainContent -->
+    </div>
+    <!-- @END_COMPONENT: MainLayout -->
+
+    <!-- @COMPONENT: AnalyticsModal -->
+    <div id="analyticsModal" class="fixed inset-0 bg-background/80 backdrop-blur-sm hidden items-center justify-center z-50" data-event="click:closeModal">
+        <div class="bg-card rounded-lg border border-border p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto" data-event="click:stopPropagation">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold text-foreground">Email Analytics Dashboard</h2>
+                <button class="text-muted-foreground hover:text-foreground" data-event="click:closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- @COMPONENT: VolumeChart -->
+                <div class="bg-background rounded-lg p-4 border border-border">
+                    <h3 class="font-medium text-foreground mb-4">Email Volume (Last 7 Days)</h3>
+                    <canvas id="volumeChart" width="400" height="200"></canvas>
+                </div>
+                <!-- @END_COMPONENT: VolumeChart -->
+
+                <!-- @COMPONENT: SentimentChart -->
+                <div class="bg-background rounded-lg p-4 border border-border">
+                    <h3 class="font-medium text-foreground mb-4">Sentiment Distribution</h3>
+                    <canvas id="sentimentChart" width="400" height="200"></canvas>
+                </div>
+                <!-- @END_COMPONENT: SentimentChart -->
+
+                <!-- @COMPONENT: ResponseTimeChart -->
+                <div class="bg-background rounded-lg p-4 border border-border">
+                    <h3 class="font-medium text-foreground mb-4">Average Response Time</h3>
+                    <canvas id="responseTimeChart" width="400" height="200"></canvas>
+                </div>
+                <!-- @END_COMPONENT: ResponseTimeChart -->
+
+                <!-- @COMPONENT: CategoryChart -->
+                <div class="bg-background rounded-lg p-4 border border-border">
+                    <h3 class="font-medium text-foreground mb-4">Top Categories</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-foreground">Account Issues</span>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-24 h-2 bg-muted rounded-full">
+                                    <div class="w-3/4 h-2 bg-destructive rounded-full"></div>
+                                </div>
+                                <span class="text-sm text-muted-foreground">45</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-foreground">Product Inquiries</span>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-24 h-2 bg-muted rounded-full">
+                                    <div class="w-1/2 h-2 bg-primary rounded-full"></div>
+                                </div>
+                                <span class="text-sm text-muted-foreground">32</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-foreground">Technical Support</span>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-24 h-2 bg-muted rounded-full">
+                                    <div class="w-1/3 h-2 bg-amber-500 rounded-full"></div>
+                                </div>
+                                <span class="text-sm text-muted-foreground">28</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-foreground">Billing Questions</span>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-24 h-2 bg-muted rounded-full">
+                                    <div class="w-1/4 h-2 bg-green-500 rounded-full"></div>
+                                </div>
+                                <span class="text-sm text-muted-foreground">22</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: CategoryChart -->
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: AnalyticsModal -->
+
+    <script>
+    (function() {
+        // TODO: Implement email fetching, AI response generation, and real-time updates
+        // TODO: Integrate with Gmail API, OpenAI API, and sentiment analysis services
+        // TODO: Implement proper state management for email filtering and sorting
+        
+        // Mock data for demonstration
+        const mockEmails = [
+            {
+                id: 1,
+                subject: "Critical: Cannot access account - immediate help needed",
+                sender: "john.doe@example.com",
+                priority: "urgent",
+                sentiment: "negative",
+                timestamp: "2 min ago",
+                preview: "I've been trying to access my account for the past hour but keep getting an error message...",
+                extractedInfo: {
+                    phone: "+1-555-0123",
+                    urgency: "Presentation in 30 minutes",
+                    category: "Account Access Issue"
+                }
+            }
+        ];
+
+        // Initialize charts when analytics modal is opened
+        function initializeCharts() {
+            // Volume Chart
+            const volumeCtx = document.getElementById('volumeChart');
+            if (volumeCtx) {
+                new Chart(volumeCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Emails Received',
+                            data: [45, 52, 38, 67, 73, 42, 35],
+                            borderColor: 'hsl(217 91% 60%)',
+                            backgroundColor: 'hsl(217 91% 60% / 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Sentiment Chart
+            const sentimentCtx = document.getElementById('sentimentChart');
+            if (sentimentCtx) {
+                new Chart(sentimentCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Positive', 'Neutral', 'Negative'],
+                        datasets: [{
+                            data: [45, 35, 20],
+                            backgroundColor: [
+                                'hsl(142 76% 36%)',
+                                'hsl(217 91% 60%)',
+                                'hsl(0 84% 60%)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+            }
+
+            // Response Time Chart
+            const responseTimeCtx = document.getElementById('responseTimeChart');
+            if (responseTimeCtx) {
+                new Chart(responseTimeCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Avg Response Time (minutes)',
+                            data: [12, 19, 8, 15, 22, 18, 14],
+                            backgroundColor: 'hsl(217 91% 60% / 0.7)',
+                            borderColor: 'hsl(217 91% 60%)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Event handlers for demonstration
+        document.addEventListener('click', function(e) {
+            const target = e.target;
+            
+            if (target.closest('[data-event*="navigateToAnalytics"]')) {
+                document.getElementById('analyticsModal').classList.remove('hidden');
+                document.getElementById('analyticsModal').classList.add('flex');
+                setTimeout(initializeCharts, 100);
+            }
+            
+            if (target.closest('[data-event*="closeModal"]')) {
+                document.getElementById('analyticsModal').classList.add('hidden');
+                document.getElementById('analyticsModal').classList.remove('flex');
+            }
+            
+            if (target.closest('[data-event*="generateResponse"]')) {
+                // Simulate AI response generation
+                const textarea = document.querySelector('[data-bind="generatedResponse"]');
+                if (textarea) {
+                    textarea.value = "Generating AI response...";
+                    setTimeout(() => {
+                        textarea.value = `Dear Customer,
+
+Thank you for contacting us. I understand your concern and I'm here to help resolve this issue promptly.
+
+Based on your message, I can see that this requires immediate attention. Let me connect you with our specialist team who can provide direct assistance.
+
+Best regards,
+AI Support Assistant`;
+                    }, 2000);
+                }
+            }
+        });
+
+        // Prevent modal close when clicking inside modal content
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('[data-event*="stopPropagation"]')) {
+                e.stopPropagation();
+            }
+        });
+    })();
+    </script>
+</body>
+</html>
